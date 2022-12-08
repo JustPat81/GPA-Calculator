@@ -1,13 +1,14 @@
 /*
 Title: home.component.ts
 Author: Professor Krasso
-Date: 27 November 2022
+Date: 04 December 2022
 Modified by: Patrick Wolff
 Description: Home Component
 */
 
 import { Component, OnInit } from '@angular/core';
 import { ITranscript } from '../transcript.interface';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
@@ -20,17 +21,28 @@ export class HomeComponent implements OnInit {
   selectableGrades: Array<string> = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
   transcriptEntries: Array<ITranscript> = [];
   gpaTotal: number = 0;
+  transcriptForm!: FormGroup;
 
-  constructor() {
+  constructor(private fb: FormBuilder) {
     this.transcriptEntry = {} as ITranscript;
    }
 
   ngOnInit(): void {
+    this.transcriptForm = this.fb.group({
+      course: ['', Validators.required],
+      grade: ['', Validators.required]
+    })
   }
 
-  saveEntry() {
-    this.transcriptEntries.push(this.transcriptEntry);
-    this.transcriptEntry = {} as ITranscript;
+  get form() { return this.transcriptForm.controls; }
+
+  onSubmit(event:any) {
+    this.transcriptEntries.push({
+      course: this.form['course'].value,
+      grade: this.form['grade'].value
+    });
+
+    event.currentTarget.reset();
   }
 
   calculateResults() {
